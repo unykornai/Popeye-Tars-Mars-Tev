@@ -1,0 +1,19 @@
+# Unykorn L1 Node A Configuration
+# Role: Block Producer
+
+[node]
+name = "node-a"
+data_dir = "./dev_data/node-a"
+log_level = "info"
+
+[runtime]
+chain_id = "unykorn-devnet"
+producer_enabled = true
+# Producer key (32 bytes hex - dev only)
+producer_key = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+[network]
+listen_port = 9001
+max_peers = 10
+enable_discovery = true
+bootstrap_peers = []

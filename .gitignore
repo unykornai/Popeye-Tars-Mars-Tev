@@ -1,0 +1,21 @@
+# Build artifacts
+/target
+
+# Runtime data (regenerated per run)
+/data
+/dev_data
+/logs
+/soak_results
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

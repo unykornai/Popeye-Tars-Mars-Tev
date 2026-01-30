@@ -1,0 +1,17 @@
+# Unykorn L1 Node C Configuration
+# Role: Validator
+
+[node]
+name = "node-c"
+data_dir = "./dev_data/node-c"
+log_level = "info"
+
+[runtime]
+chain_id = "unykorn-devnet"
+producer_enabled = false
+
+[network]
+listen_port = 9003
+max_peers = 10
+enable_discovery = true
+bootstrap_peers = ["127.0.0.1:9001", "127.0.0.1:9002"]

@@ -1,0 +1,25 @@
+[package]
+name = "node"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Unykorn L1 Node - Binary entrypoint integrating all components"
+
+[[bin]]
+name = "unykorn"
+path = "src/main.rs"
+
+[dependencies]
+mars = { path = "../mars" }
+tev = { path = "../tev" }
+tar = { path = "../tar" }
+popeye = { path = "../popeye" }
+tokio.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+bincode.workspace = true
+toml = "0.8"
+
+[dev-dependencies]
+tempfile = "3.10"
