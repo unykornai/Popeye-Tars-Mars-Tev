@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="popeyeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="tevGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="marsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="tarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="400" fill="url(#bgGrad)"/>
+  
+  <!-- Title -->
+  <text x="400" y="50" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#ffffff" text-anchor="middle">
+    🦄 UNYKORN L1 ARCHITECTURE
+  </text>
+  <text x="400" y="75" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8" text-anchor="middle">
+    Trust Boundaries &amp; Data Flow
+  </text>
+  
+  <!-- Connection Lines -->
+  <path d="M 200 200 L 300 200" stroke="#64748b" stroke-width="3" stroke-dasharray="5,5" filter="url(#glow)"/>
+  <path d="M 350 200 L 450 200" stroke="#22c55e" stroke-width="3" filter="url(#glow)"/>
+  <path d="M 500 200 L 600 200" stroke="#22c55e" stroke-width="3" filter="url(#glow)"/>
+  
+  <!-- Arrows -->
+  <polygon points="295,195 305,200 295,205" fill="#64748b"/>
+  <polygon points="445,195 455,200 445,205" fill="#22c55e"/>
+  <polygon points="595,195 605,200 595,205" fill="#22c55e"/>
+  
+  <!-- POPEYE Box -->
+  <rect x="80" y="150" width="120" height="100" rx="10" fill="url(#popeyeGrad)" filter="url(#glow)"/>
+  <text x="140" y="185" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">🌐</text>
+  <text x="140" y="210" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">POPEYE</text>
+  <text x="140" y="230" font-family="Arial, sans-serif" font-size="10" fill="#bfdbfe" text-anchor="middle">P2P Network</text>
+  
+  <!-- TEV Box -->
+  <rect x="230" y="150" width="120" height="100" rx="10" fill="url(#tevGrad)" filter="url(#glow)"/>
+  <text x="290" y="185" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">🔐</text>
+  <text x="290" y="210" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">TEV</text>
+  <text x="290" y="230" font-family="Arial, sans-serif" font-size="10" fill="#fef3c7" text-anchor="middle">Crypto Gate</text>
+  
+  <!-- MARS Box -->
+  <rect x="380" y="150" width="120" height="100" rx="10" fill="url(#marsGrad)" filter="url(#glow)"/>
+  <text x="440" y="185" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">🧠</text>
+  <text x="440" y="210" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">MARS</text>
+  <text x="440" y="230" font-family="Arial, sans-serif" font-size="10" fill="#bbf7d0" text-anchor="middle">Runtime</text>
+  
+  <!-- TAR Box -->
+  <rect x="530" y="150" width="120" height="100" rx="10" fill="url(#tarGrad)" filter="url(#glow)"/>
+  <text x="590" y="185" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">💾</text>
+  <text x="590" y="210" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">TAR</text>
+  <text x="590" y="230" font-family="Arial, sans-serif" font-size="10" fill="#fecaca" text-anchor="middle">Storage</text>
+  
+  <!-- Trust Boundary Label -->
+  <rect x="220" y="270" width="150" height="30" rx="5" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+  <text x="295" y="290" font-family="Arial, sans-serif" font-size="11" fill="#f59e0b" text-anchor="middle">🛡️ TRUST BOUNDARY</text>
+  
+  <!-- Zone Labels -->
+  <rect x="80" y="320" width="120" height="25" rx="5" fill="#1e293b" stroke="#ef4444" stroke-width="1"/>
+  <text x="140" y="337" font-family="Arial, sans-serif" font-size="10" fill="#ef4444" text-anchor="middle">⚠️ UNTRUSTED ZONE</text>
+  
+  <rect x="380" y="320" width="270" height="25" rx="5" fill="#1e293b" stroke="#22c55e" stroke-width="1"/>
+  <text x="515" y="337" font-family="Arial, sans-serif" font-size="10" fill="#22c55e" text-anchor="middle">✓ TRUSTED ZONE</text>
+  
+  <!-- NODE Integration -->
+  <rect x="680" y="120" width="100" height="160" rx="10" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+  <text x="730" y="155" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">🖥️</text>
+  <text x="730" y="180" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#a5b4fc" text-anchor="middle">NODE</text>
+  <text x="730" y="200" font-family="Arial, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Integrates</text>
+  <text x="730" y="215" font-family="Arial, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">All Components</text>
+  
+  <!-- Connection from NODE to components -->
+  <path d="M 680 200 L 650 200" stroke="#6366f1" stroke-width="2" stroke-dasharray="3,3"/>
+  
+  <!-- Footer -->
+  <text x="400" y="380" font-family="Arial, sans-serif" font-size="11" fill="#64748b" text-anchor="middle">
+    Built with 🦀 Rust • Production-Grade L1 Blockchain
+  </text>
+</svg>
