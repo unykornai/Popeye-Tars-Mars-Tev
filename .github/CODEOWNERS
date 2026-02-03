@@ -1,0 +1,20 @@
+# Code Owners for Unykorn L1
+# These owners will be automatically requested for review on PRs
+
+# Default owner for everything
+* @kevan
+
+# Specific components
+/mars/      @kevan
+/tev/       @kevan
+/popeye/    @kevan
+/tar/       @kevan
+/consensus/ @kevan
+/node/      @kevan
+
+# Documentation
+/docs/      @kevan
+/*.md       @kevan
+
+# CI/CD
+/.github/   @kevan

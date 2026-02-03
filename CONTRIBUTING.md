@@ -5,6 +5,7 @@ Thank you for your interest in contributing to Unykorn L1! This document provide
 ## Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
+- [Developer Certificate of Origin](#developer-certificate-of-origin-dco)
 - [Getting Started](#getting-started)
 - [Development Process](#development-process)
 - [Pull Request Process](#pull-request-process)
@@ -13,7 +14,27 @@ Thank you for your interest in contributing to Unykorn L1! This document provide
 
 ## Code of Conduct
 
-This project adheres to a code of conduct. By participating, you are expected to uphold this code. Please be respectful and constructive in all interactions.
+This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please be respectful and constructive in all interactions.
+
+## Developer Certificate of Origin (DCO)
+
+We use the [Developer Certificate of Origin](https://developercertificate.org/) (DCO) to ensure all contributions are properly licensed. This is a lightweight alternative to a CLA.
+
+### How to Sign Off
+
+Add a sign-off line to your commit messages:
+
+```
+Signed-off-by: Your Name <your.email@example.com>
+```
+
+You can do this automatically with `git commit -s`:
+
+```bash
+git commit -s -m "feat(mars): add new state transition"
+```
+
+By signing off, you certify that you have the right to submit this code under the MIT License.
 
 ## Getting Started
 
@@ -69,6 +90,7 @@ git checkout -b feature/my-new-feature
 - [ ] Clippy warnings addressed
 - [ ] Code formatted
 - [ ] Documentation updated
+- [ ] Commits signed off (DCO)
 - [ ] Commit messages are clear
 
 ## Coding Standards
@@ -142,8 +164,18 @@ Network (untrusted) → TEV (verify) → MARS (validate) → TAR (persist)
 
 Nothing crosses from POPEYE to MARS without passing TEV.
 
+### 6. Consensus Rules
+
+- ❌ Never mutates state directly
+- ❌ Never validates transactions
+- ✅ Agreement on ordering and finality only
+
 ## Questions?
 
 If you have questions, please open an issue or reach out to the maintainers.
+
+## License
+
+By contributing to Unykorn L1, you agree that your contributions will be licensed under the MIT License.
 
 Thank you for contributing! 🦄

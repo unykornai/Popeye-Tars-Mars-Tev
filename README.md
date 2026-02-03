@@ -20,6 +20,16 @@
 
 ---
 
+> **Open to builders. Fork-friendly. Brand-protected.**
+>
+> Unykorn L1 is open source and welcomes forks, research, and extensions.
+> Contributions upstream are encouraged under our [Contribution Guidelines](CONTRIBUTING.md).
+>
+> The **Unykorn** name and logos are protected. Forks must not imply they are the official Unykorn network.
+> See [TRADEMARK_POLICY.md](TRADEMARK_POLICY.md) for details.
+
+---
+
 <img src="docs/assets/architecture-hero.svg" alt="Architecture" width="600"/>
 
 </div>
