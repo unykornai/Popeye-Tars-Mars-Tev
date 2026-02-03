@@ -39,7 +39,7 @@ impl StateStore {
         let temp_path = self.temp_path();
         let final_path = self.latest_path();
 
-        let bytes = bincode::serialize(state).map_err(|_| StorageError::Serialization)?;
+        let bytes = bincode::serialize(state).map_err(|e| StorageError::Bincode { reason: e.to_string() })?;
 
         // Write to temp file
         fs::write(&temp_path, &bytes)?;
@@ -61,7 +61,7 @@ impl StateStore {
         }
 
         let bytes = fs::read(&path)?;
-        bincode::deserialize(&bytes).map_err(|_| StorageError::Serialization)
+        bincode::deserialize(&bytes).map_err(|e| StorageError::Bincode { reason: e.to_string() })
     }
 
     /// Check if latest state exists.
@@ -74,7 +74,7 @@ impl StateStore {
         let path = self.snapshot_path(height);
         let temp_path = self.base_path.join(format!("snapshot_{:06}.state.tmp", height));
 
-        let bytes = bincode::serialize(state).map_err(|_| StorageError::Serialization)?;
+        let bytes = bincode::serialize(state).map_err(|e| StorageError::Bincode { reason: e.to_string() })?;
 
         fs::write(&temp_path, &bytes)?;
         fs::rename(&temp_path, &path)?;
@@ -93,7 +93,7 @@ impl StateStore {
         }
 
         let bytes = fs::read(&path)?;
-        bincode::deserialize(&bytes).map_err(|_| StorageError::Serialization)
+        bincode::deserialize(&bytes).map_err(|e| StorageError::Bincode { reason: e.to_string() })
     }
 }
 

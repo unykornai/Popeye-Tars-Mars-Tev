@@ -1,0 +1,34 @@
+[package]
+name = "consensus"
+version = "0.1.0"
+edition = "2021"
+authors = ["Unykorn Team"]
+description = "Deterministic BFT consensus layer for Unykorn L1"
+license = "MIT"
+readme = "README.md"
+
+[dependencies]
+# Cryptographic primitives (shared with TEV)
+ed25519-dalek = { version = "2", features = ["serde"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+hex = "0.4"
+
+# Error handling
+thiserror = "1"
+
+# Logging
+tracing = "0.1"
+
+# Async runtime
+tokio = { version = "1", features = ["sync", "time"] }
+
+# Internal crates
+tev = { path = "../tev" }
+mars = { path = "../mars" }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full", "test-util"] }
+rand = "0.8"

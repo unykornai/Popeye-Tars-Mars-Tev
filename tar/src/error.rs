@@ -9,9 +9,13 @@ pub enum StorageError {
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
 
-    /// Serialization/deserialization failed
-    #[error("serialization error")]
-    Serialization,
+    /// JSON serialization/deserialization failed
+    #[error("json error: {0}")]
+    Json(#[from] serde_json::Error),
+
+    /// Binary serialization/deserialization failed
+    #[error("bincode error: {reason}")]
+    Bincode { reason: String },
 
     /// Data not found
     #[error("not found: {key}")]

@@ -13,11 +13,20 @@
 //!
 //! TAR only stores data that has passed through TEV and MARS.
 //! It never validates - it only remembers.
+//!
+//! ## Consensus Support
+//!
+//! TAR also persists consensus artifacts for crash recovery:
+//! - Round state (height, round, phase)
+//! - Finality certificates
+//! - Validator sets
 
 pub mod error;
 pub mod storage;
 pub mod block_store;
 pub mod state_store;
+pub mod consensus_store;
 
 pub use error::StorageError;
 pub use storage::Storage;
+pub use consensus_store::ConsensusStore;

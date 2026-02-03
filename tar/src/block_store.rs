@@ -37,7 +37,7 @@ impl BlockStore {
         let final_path = self.block_path(height);
 
         // Serialize
-        let bytes = bincode::serialize(block).map_err(|_| StorageError::Serialization)?;
+        let bytes = bincode::serialize(block).map_err(|e| StorageError::Bincode { reason: e.to_string() })?;
 
         // Write to temp file
         fs::write(&temp_path, &bytes)?;
@@ -59,7 +59,7 @@ impl BlockStore {
         }
 
         let bytes = fs::read(&path)?;
-        bincode::deserialize(&bytes).map_err(|_| StorageError::Serialization)
+        bincode::deserialize(&bytes).map_err(|e| StorageError::Bincode { reason: e.to_string() })
     }
 
     /// Check if a block exists at a given height.
