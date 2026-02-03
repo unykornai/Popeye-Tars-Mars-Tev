@@ -1,0 +1,1525 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unykorn L1 | Production-Grade Blockchain Runtime</title>
+    <meta name="description" content="A Production-Grade Layer-1 Blockchain Runtime Built in Rust">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦄</text></svg>">
+    
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a25;
+            --bg-gradient: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --border: rgba(139, 92, 246, 0.2);
+            --border-hover: rgba(139, 92, 246, 0.5);
+            
+            --glow-primary: 0 0 40px rgba(139, 92, 246, 0.3);
+            --glow-secondary: 0 0 40px rgba(6, 182, 212, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        code, pre {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--bg-gradient);
+            overflow: hidden;
+        }
+        
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+            animation: bgPulse 20s ease-in-out infinite;
+        }
+        
+        @keyframes bgPulse {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-5%, 5%) rotate(1deg); }
+            50% { transform: translate(5%, -5%) rotate(-1deg); }
+            75% { transform: translate(-3%, -3%) rotate(0.5deg); }
+        }
+        
+        /* Grid Pattern Overlay */
+        .grid-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        
+        .nav-logo span {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .nav-cta {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: var(--glow-primary);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.5);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-outline:hover {
+            background: var(--bg-card);
+            border-color: var(--border-hover);
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+        }
+        
+        .hero-content {
+            max-width: 1200px;
+            text-align: center;
+            z-index: 1;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.875rem;
+            color: var(--primary-light);
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.6s ease;
+        }
+        
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease 0.1s both;
+        }
+        
+        .hero-title .emoji {
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .hero-title .gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.25rem, 3vw, 1.75rem);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            font-weight: 400;
+            animation: fadeInUp 0.6s ease 0.2s both;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease 0.3s both;
+        }
+        
+        .hero-buttons .btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            margin-top: 4rem;
+            padding-top: 4rem;
+            border-top: 1px solid var(--border);
+            animation: fadeInUp 0.6s ease 0.4s both;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.25rem;
+        }
+        
+        /* Section Styles */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-label {
+            display: inline-block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Architecture Diagram */
+        .architecture {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 3rem;
+            margin: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .architecture::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+        
+        .arch-flow {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .arch-component {
+            background: linear-gradient(135deg, var(--bg-card-hover) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        
+        .arch-component:hover {
+            transform: translateY(-8px);
+            border-color: var(--border-hover);
+            box-shadow: var(--glow-primary);
+        }
+        
+        .arch-component.popeye { --component-color: #3b82f6; }
+        .arch-component.tev { --component-color: #f59e0b; }
+        .arch-component.mars { --component-color: #10b981; }
+        .arch-component.tar { --component-color: #ef4444; }
+        
+        .arch-component:hover {
+            border-color: var(--component-color);
+            box-shadow: 0 0 40px rgba(var(--component-color), 0.3);
+        }
+        
+        .arch-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .arch-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .arch-role {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .arch-arrow {
+            position: absolute;
+            right: -1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 1.5rem;
+            z-index: 10;
+        }
+        
+        /* Feature Cards */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-hover);
+            box-shadow: var(--glow-primary);
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+        /* Code Block */
+        .code-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+        
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .code-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .code-dots span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .code-dots span:nth-child(1) { background: #ef4444; }
+        .code-dots span:nth-child(2) { background: #f59e0b; }
+        .code-dots span:nth-child(3) { background: #10b981; }
+        
+        .code-title {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .code-copy {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .code-copy:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+        
+        .code-content {
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+        
+        .code-content pre {
+            margin: 0;
+            color: var(--text-secondary);
+        }
+        
+        .code-content .comment { color: #6b7280; }
+        .code-content .keyword { color: #c084fc; }
+        .code-content .string { color: #34d399; }
+        .code-content .function { color: #60a5fa; }
+        
+        /* Test Results Table */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        .results-table th,
+        .results-table td {
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+        }
+        
+        .results-table thead {
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .results-table th {
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+        
+        .results-table tbody tr {
+            border-top: 1px solid var(--border);
+            transition: background 0.3s ease;
+        }
+        
+        .results-table tbody tr:hover {
+            background: var(--bg-card-hover);
+        }
+        
+        .results-table .component {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .results-table .component-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.875rem;
+            border-radius: 100px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .status-badge.pass {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+        
+        /* Trust Boundary Diagram */
+        .trust-diagram {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 3rem;
+            margin: 3rem 0;
+        }
+        
+        .trust-zones {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .trust-zone {
+            padding: 2rem;
+            border-radius: 16px;
+            position: relative;
+        }
+        
+        .trust-zone.untrusted {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .trust-zone.gate {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .trust-zone.trusted {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .zone-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .zone-description {
+            color: var(--text-secondary);
+        }
+        
+        .zone-arrow {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--primary);
+            padding: 0.5rem 0;
+        }
+        
+        /* Roadmap */
+        .roadmap {
+            position: relative;
+        }
+        
+        .roadmap-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            transform: translateX(-50%);
+        }
+        
+        .roadmap-items {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+        
+        .roadmap-item {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+        }
+        
+        .roadmap-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        
+        .roadmap-content {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+        
+        .roadmap-dot {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: var(--glow-primary);
+            z-index: 1;
+        }
+        
+        .roadmap-dot.completed {
+            background: var(--success);
+        }
+        
+        .roadmap-dot.active {
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+        
+        .roadmap-phase {
+            font-size: 0.875rem;
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+        
+        .roadmap-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        
+        .roadmap-description {
+            color: var(--text-secondary);
+        }
+        
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 4rem 2rem;
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 4rem;
+        }
+        
+        .footer-brand {
+            max-width: 300px;
+        }
+        
+        .footer-brand .nav-logo {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .footer-links h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 3rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .arch-flow {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .arch-arrow {
+                display: none;
+            }
+            
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero {
+                padding: 6rem 1.5rem 3rem;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            .arch-flow {
+                grid-template-columns: 1fr;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .roadmap-line {
+                left: 20px;
+            }
+            
+            .roadmap-item,
+            .roadmap-item:nth-child(even) {
+                flex-direction: row;
+            }
+            
+            .roadmap-content {
+                margin-left: 3rem;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+        
+        /* Animations on Scroll */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="grid-pattern"></div>
+    
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                🦄 <span>Unykorn L1</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#components">Components</a></li>
+                <li><a href="#testing">Testing</a></li>
+                <li><a href="#roadmap">Roadmap</a></li>
+            </ul>
+            <div class="nav-cta">
+                <a href="#quick-start" class="btn btn-outline">Get Started</a>
+                <a href="https://github.com/unykornai/Popeye-Tars-Mars-Tev" class="btn btn-primary" target="_blank">
+                    ⭐ GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                Production Ready • 49 Tests Passing
+            </div>
+            <h1 class="hero-title">
+                <span class="emoji">🦄</span> <span class="gradient">Unykorn L1</span>
+            </h1>
+            <p class="hero-subtitle">
+                A Production-Grade Layer-1 Blockchain Runtime Built in Rust. 
+                Deterministic execution. Cryptographic verification. Crash-safe persistence.
+            </p>
+            <div class="hero-buttons">
+                <a href="#quick-start" class="btn btn-primary">
+                    🚀 Get Started
+                </a>
+                <a href="#architecture" class="btn btn-outline">
+                    📖 View Architecture
+                </a>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Core Components</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">49</div>
+                    <div class="stat-label">Tests Passing</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Rust Native</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">3s</div>
+                    <div class="stat-label">Block Time</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section id="features">
+        <div class="section-header">
+            <span class="section-label">Why Unykorn</span>
+            <h2 class="section-title">Built for the Future</h2>
+            <p class="section-subtitle">
+                A closed-loop execution organism with strict trust boundaries
+            </p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Security First</h3>
+                <p class="feature-description">
+                    Every message passes through cryptographic verification before reaching the runtime. 
+                    Nothing crosses from POPEYE to MARS without passing TEV.
+                </p>
+            </div>
+            
+            <div class="feature-card fade-in">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Performance Optimized</h3>
+                <p class="feature-description">
+                    Built in Rust for maximum performance and safety. Deterministic execution 
+                    with crash-safe persistence and atomic writes.
+                </p>
+            </div>
+            
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🧩</div>
+                <h3 class="feature-title">Modular Architecture</h3>
+                <p class="feature-description">
+                    Four distinct layers with clear separation of concerns. Each component 
+                    has exactly one responsibility with no circular dependencies.
+                </p>
+            </div>
+            
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🛡️</div>
+                <h3 class="feature-title">Fault Isolation</h3>
+                <p class="feature-description">
+                    Failures are contained to one layer. Network issues can't corrupt state. 
+                    Invalid signatures can't reach the runtime.
+                </p>
+            </div>
+            
+            <div class="feature-card fade-in">
+                <div class="feature-icon">💾</div>
+                <h3 class="feature-title">Crash Recovery</h3>
+                <p class="feature-description">
+                    TAR provides crash-safe persistence with atomic writes. 
+                    The chain recovers cleanly from any interruption.
+                </p>
+            </div>
+            
+            <div class="feature-card fade-in">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Observable</h3>
+                <p class="feature-description">
+                    Clear boundaries for logging and metrics. Every component exposes 
+                    its state for monitoring and debugging.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Architecture Section -->
+    <section id="architecture">
+        <div class="section-header">
+            <span class="section-label">System Design</span>
+            <h2 class="section-title">Architecture Overview</h2>
+            <p class="section-subtitle">
+                Four components working together as a unified runtime
+            </p>
+        </div>
+        
+        <div class="architecture">
+            <div class="arch-flow">
+                <div class="arch-component popeye">
+                    <span class="arch-icon">🌐</span>
+                    <div class="arch-name">POPEYE</div>
+                    <div class="arch-role">Network Layer</div>
+                    <span class="arch-arrow">→</span>
+                </div>
+                
+                <div class="arch-component tev">
+                    <span class="arch-icon">🔐</span>
+                    <div class="arch-name">TEV</div>
+                    <div class="arch-role">Crypto Gate</div>
+                    <span class="arch-arrow">→</span>
+                </div>
+                
+                <div class="arch-component mars">
+                    <span class="arch-icon">🧠</span>
+                    <div class="arch-name">MARS</div>
+                    <div class="arch-role">Runtime</div>
+                    <span class="arch-arrow">→</span>
+                </div>
+                
+                <div class="arch-component tar">
+                    <span class="arch-icon">💾</span>
+                    <div class="arch-name">TAR</div>
+                    <div class="arch-role">Storage</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Trust Boundaries -->
+        <div class="trust-diagram fade-in">
+            <h3 style="text-align: center; margin-bottom: 2rem; font-size: 1.5rem;">Trust Boundaries</h3>
+            <div class="trust-zones">
+                <div class="trust-zone untrusted">
+                    <div class="zone-title">
+                        ⚠️ Untrusted Zone
+                    </div>
+                    <div class="zone-description">
+                        Network messages, peer data, external input. Any data here could be malformed, malicious, or replayed.
+                    </div>
+                </div>
+                
+                <div class="zone-arrow">↓</div>
+                
+                <div class="trust-zone gate">
+                    <div class="zone-title">
+                        🔐 TEV Gate — Cryptographic Verification
+                    </div>
+                    <div class="zone-description">
+                        ✅ Valid signature → Proceed to MARS &nbsp;&nbsp;|&nbsp;&nbsp;
+                        ❌ Invalid signature → Reject (never reaches runtime)
+                    </div>
+                </div>
+                
+                <div class="zone-arrow">↓</div>
+                
+                <div class="trust-zone trusted">
+                    <div class="zone-title">
+                        ✓ Trusted Zone
+                    </div>
+                    <div class="zone-description">
+                        MARS execution, TAR persistence. Deterministic state transitions. Crash-safe writes. Recoverable on restart.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Components Section -->
+    <section id="components">
+        <div class="section-header">
+            <span class="section-label">The Four Pillars</span>
+            <h2 class="section-title">Component Deep Dive</h2>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card fade-in" style="border-top: 3px solid #3b82f6;">
+                <div class="feature-icon" style="background: rgba(59, 130, 246, 0.2);">🌐</div>
+                <h3 class="feature-title">POPEYE — Eyes & Ears</h3>
+                <p class="feature-description">
+                    <strong>Network Perception + Message Transport</strong><br><br>
+                    Peer discovery via mDNS, gossip propagation via libp2p, message routing with duplicate suppression.
+                    <br><br>
+                    <em>"Hears rumors, not facts."</em>
+                </p>
+            </div>
+            
+            <div class="feature-card fade-in" style="border-top: 3px solid #f59e0b;">
+                <div class="feature-icon" style="background: rgba(245, 158, 11, 0.2);">🔐</div>
+                <h3 class="feature-title">TEV — Truth Gate</h3>
+                <p class="feature-description">
+                    <strong>Cryptographic Firewall</strong><br><br>
+                    Ed25519 signature verification, 96-byte transport format enforcement, replay protection.
+                    <br><br>
+                    <em>"Papers checked. No exceptions."</em>
+                </p>
+            </div>
+            
+            <div class="feature-card fade-in" style="border-top: 3px solid #10b981;">
+                <div class="feature-icon" style="background: rgba(16, 185, 129, 0.2);">🧠</div>
+                <h3 class="feature-title">MARS — Runtime Brain</h3>
+                <p class="feature-description">
+                    <strong>Deterministic State Machine</strong><br><br>
+                    Canonical state, transaction validation, block production, pure state transitions.
+                    <br><br>
+                    <em>"If MARS says no, the network doesn't matter."</em>
+                </p>
+            </div>
+            
+            <div class="feature-card fade-in" style="border-top: 3px solid #ef4444;">
+                <div class="feature-icon" style="background: rgba(239, 68, 68, 0.2);">💾</div>
+                <h3 class="feature-title">TAR — Memory Vault</h3>
+                <p class="feature-description">
+                    <strong>Persistent Storage Layer</strong><br><br>
+                    Append-only block storage, state snapshots, crash recovery with atomic writes.
+                    <br><br>
+                    <em>"Remembers, but never validates."</em>
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Quick Start Section -->
+    <section id="quick-start">
+        <div class="section-header">
+            <span class="section-label">Getting Started</span>
+            <h2 class="section-title">Quick Start</h2>
+            <p class="section-subtitle">
+                Up and running in under 5 minutes
+            </p>
+        </div>
+        
+        <div class="code-section fade-in">
+            <div class="code-header">
+                <div class="code-dots">
+                    <span></span><span></span><span></span>
+                </div>
+                <span class="code-title">Terminal</span>
+                <button class="code-copy" title="Copy to clipboard">📋</button>
+            </div>
+            <div class="code-content">
+<pre><span class="comment"># Clone the repository</span>
+<span class="function">git clone</span> https://github.com/unykornai/Popeye-Tars-Mars-Tev.git
+<span class="keyword">cd</span> Popeye-Tars-Mars-Tev
+
+<span class="comment"># Build all components</span>
+<span class="function">cargo build</span> --workspace
+
+<span class="comment"># Run tests (49 tests)</span>
+<span class="function">cargo test</span> --workspace
+
+<span class="comment"># Start a node</span>
+<span class="function">cargo run</span> --release -p node
+
+<span class="comment"># Or start a 3-node devnet</span>
+.\scripts\start-devnet.ps1</pre>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testing Section -->
+    <section id="testing">
+        <div class="section-header">
+            <span class="section-label">Quality Assurance</span>
+            <h2 class="section-title">Test Results</h2>
+            <p class="section-subtitle">
+                Comprehensive test coverage across all components
+            </p>
+        </div>
+        
+        <table class="results-table fade-in">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Tests</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="component">
+                            <div class="component-icon" style="background: rgba(16, 185, 129, 0.2);">🧠</div>
+                            MARS
+                        </div>
+                    </td>
+                    <td>14</td>
+                    <td><span class="status-badge pass">✓ Pass</span></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="component">
+                            <div class="component-icon" style="background: rgba(59, 130, 246, 0.2);">🌐</div>
+                            POPEYE
+                        </div>
+                    </td>
+                    <td>12</td>
+                    <td><span class="status-badge pass">✓ Pass</span></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="component">
+                            <div class="component-icon" style="background: rgba(245, 158, 11, 0.2);">🔐</div>
+                            TEV
+                        </div>
+                    </td>
+                    <td>9</td>
+                    <td><span class="status-badge pass">✓ Pass</span></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="component">
+                            <div class="component-icon" style="background: rgba(239, 68, 68, 0.2);">💾</div>
+                            TAR
+                        </div>
+                    </td>
+                    <td>8</td>
+                    <td><span class="status-badge pass">✓ Pass</span></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="component">
+                            <div class="component-icon" style="background: rgba(139, 92, 246, 0.2);">🖥️</div>
+                            NODE
+                        </div>
+                    </td>
+                    <td>5</td>
+                    <td><span class="status-badge pass">✓ Pass</span></td>
+                </tr>
+                <tr style="background: rgba(139, 92, 246, 0.05);">
+                    <td>
+                        <div class="component" style="font-weight: 800;">
+                            <div class="component-icon" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">Σ</div>
+                            Total
+                        </div>
+                    </td>
+                    <td><strong>49</strong></td>
+                    <td><span class="status-badge pass" style="font-weight: 700;">✓ All Passing</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    
+    <!-- Roadmap Section -->
+    <section id="roadmap">
+        <div class="section-header">
+            <span class="section-label">What's Next</span>
+            <h2 class="section-title">Development Roadmap</h2>
+        </div>
+        
+        <div class="roadmap">
+            <div class="roadmap-line"></div>
+            <div class="roadmap-items">
+                <div class="roadmap-item fade-in">
+                    <div class="roadmap-content">
+                        <div class="roadmap-phase">Phase 1 — Complete</div>
+                        <h3 class="roadmap-title">✅ Foundation</h3>
+                        <p class="roadmap-description">
+                            Core architecture, P2P networking with libp2p, Ed25519 cryptography, 
+                            crash-safe storage, 49 passing tests.
+                        </p>
+                    </div>
+                    <div class="roadmap-dot completed"></div>
+                    <div style="flex: 1;"></div>
+                </div>
+                
+                <div class="roadmap-item fade-in">
+                    <div style="flex: 1;"></div>
+                    <div class="roadmap-dot active"></div>
+                    <div class="roadmap-content">
+                        <div class="roadmap-phase">Phase 2 — In Progress</div>
+                        <h3 class="roadmap-title">🚧 Production Hardening</h3>
+                        <p class="roadmap-description">
+                            24-hour soak testing, documentation, performance benchmarks, 
+                            monitoring dashboards, mainnet preparation.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="roadmap-item fade-in">
+                    <div class="roadmap-content">
+                        <div class="roadmap-phase">Phase 3 — Q2 2026</div>
+                        <h3 class="roadmap-title">📋 Consensus Layer</h3>
+                        <p class="roadmap-description">
+                            Byzantine fault tolerance, validator set management, 
+                            deterministic finality, block voting mechanism.
+                        </p>
+                    </div>
+                    <div class="roadmap-dot"></div>
+                    <div style="flex: 1;"></div>
+                </div>
+                
+                <div class="roadmap-item fade-in">
+                    <div style="flex: 1;"></div>
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-content">
+                        <div class="roadmap-phase">Phase 4 — 2027</div>
+                        <h3 class="roadmap-title">🔮 Smart Contracts & Scaling</h3>
+                        <p class="roadmap-description">
+                            WASM/EVM execution, gas metering, sharding, 
+                            cross-shard transactions, light clients.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="#" class="nav-logo">
+                    🦄 <span>Unykorn L1</span>
+                </a>
+                <p>
+                    A production-grade Layer-1 blockchain runtime built in Rust. 
+                    Open source under MIT License.
+                </p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Documentation</h4>
+                <ul>
+                    <li><a href="#quick-start">Quick Start</a></li>
+                    <li><a href="#architecture">Architecture</a></li>
+                    <li><a href="#components">Components</a></li>
+                    <li><a href="#testing">Testing</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="https://github.com/unykornai/Popeye-Tars-Mars-Tev" target="_blank">GitHub</a></li>
+                    <li><a href="https://github.com/unykornai/Popeye-Tars-Mars-Tev/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+                    <li><a href="https://github.com/unykornai/Popeye-Tars-Mars-Tev/blob/main/LICENSE" target="_blank">License</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Operations</h4>
+                <ul>
+                    <li><a href="https://github.com/unykornai/Popeye-Tars-Mars-Tev/blob/main/OPERATOR_RUNBOOK.md" target="_blank">Runbook</a></li>
+                    <li><a href="https://github.com/unykornai/Popeye-Tars-Mars-Tev/blob/main/SOAK_TEST_CHECKLIST.md" target="_blank">Soak Testing</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>© 2026 Unykorn Team. Built with 🦀 Rust and ❤️</p>
+            <div class="social-links">
+                <a href="https://github.com/unykornai/Popeye-Tars-Mars-Tev" target="_blank" title="GitHub">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Navbar scroll effect
+        const nav = document.querySelector('.nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(10, 10, 15, 0.95)';
+            } else {
+                nav.style.background = 'rgba(10, 10, 15, 0.8)';
+            }
+        });
+        
+        // Copy code functionality
+        document.querySelectorAll('.code-copy').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.closest('.code-section').querySelector('pre').textContent;
+                navigator.clipboard.writeText(code);
+                btn.textContent = '✓';
+                setTimeout(() => btn.textContent = '📋', 2000);
+            });
+        });
+    </script>
+</body>
+</html>

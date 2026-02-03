@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture | Unykorn L1</title>
+    <meta name="description" content="Unykorn L1 Architecture - Trust boundaries, data flow, and component design">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦄</text></svg>">
+    
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a25;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: rgba(139, 92, 246, 0.2);
+            --border-hover: rgba(139, 92, 246, 0.5);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        
+        code, pre { font-family: 'JetBrains Mono', monospace; }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        
+        .nav-logo span {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-primary);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+        }
+        
+        /* Page Header */
+        .page-header {
+            padding: 10rem 2rem 4rem;
+            text-align: center;
+            background: radial-gradient(ellipse at center top, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+        }
+        
+        .page-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+        
+        .page-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Content */
+        .content {
+            padding: 4rem 2rem;
+        }
+        
+        .content h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .content h2:first-child {
+            margin-top: 0;
+        }
+        
+        .content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 2rem 0 1rem;
+            color: var(--primary-light);
+        }
+        
+        .content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .content strong {
+            color: var(--text-primary);
+        }
+        
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-hover);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.2);
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        /* ASCII Diagram */
+        .diagram-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+        
+        .diagram-box pre {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: rgba(139, 92, 246, 0.1);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+        
+        td {
+            color: var(--text-secondary);
+        }
+        
+        tr:hover td {
+            background: var(--bg-card-hover);
+        }
+        
+        /* Flow Diagram */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 3rem 0;
+        }
+        
+        .flow-box {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .flow-box:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+        
+        .flow-box.popeye { border-color: #3b82f6; }
+        .flow-box.tev { border-color: #f59e0b; }
+        .flow-box.mars { border-color: #10b981; }
+        .flow-box.tar { border-color: #ef4444; }
+        
+        .flow-icon { font-size: 2rem; }
+        .flow-name { font-weight: 700; margin-top: 0.5rem; }
+        .flow-role { font-size: 0.875rem; color: var(--text-muted); }
+        
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        .footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .page-title { font-size: 2.5rem; }
+            .flow-container { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">🦄 <span>Unykorn L1</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="architecture.html" class="active">Architecture</a></li>
+                <li><a href="index.html#components">Components</a></li>
+                <li><a href="index.html#testing">Testing</a></li>
+            </ul>
+            <a href="https://github.com/unykornai/Popeye-Tars-Mars-Tev" class="btn" target="_blank">⭐ GitHub</a>
+        </div>
+    </nav>
+    
+    <header class="page-header">
+        <h1 class="page-title">🏗️ Architecture</h1>
+        <p class="page-subtitle">Understanding the Unykorn L1 system design, trust boundaries, and data flow patterns</p>
+    </header>
+    
+    <main class="content container">
+        <h2>System Overview</h2>
+        <p>
+            Unykorn L1 is a <strong>closed-loop execution organism</strong> — not just modules, but an integrated 
+            blockchain runtime with strict trust boundaries. The architecture enforces clear separation between 
+            untrusted network input and trusted state execution.
+        </p>
+        
+        <div class="flow-container">
+            <div class="flow-box popeye">
+                <div class="flow-icon">🌐</div>
+                <div class="flow-name">POPEYE</div>
+                <div class="flow-role">Network</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box tev">
+                <div class="flow-icon">🔐</div>
+                <div class="flow-name">TEV</div>
+                <div class="flow-role">Verify</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box mars">
+                <div class="flow-icon">🧠</div>
+                <div class="flow-name">MARS</div>
+                <div class="flow-role">Execute</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box tar">
+                <div class="flow-icon">💾</div>
+                <div class="flow-name">TAR</div>
+                <div class="flow-role">Store</div>
+            </div>
+        </div>
+        
+        <h2>Trust Boundaries</h2>
+        <p>
+            The architecture enforces strict trust boundaries. <strong>Nothing crosses from the network 
+            to the runtime without cryptographic verification.</strong>
+        </p>
+        
+        <div class="diagram-box">
+<pre>
+┌──────────────────────────────────────────────────────────────────────┐
+│                        ⚠️  UNTRUSTED ZONE                            │
+│      Network messages, peer data, external input                     │
+│      Any data here could be malformed, malicious, or replayed        │
+└──────────────────────────────────────┬───────────────────────────────┘
+                                       │
+                                       ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                       🔐 TEV GATE                                    │
+│                  Cryptographic Verification                          │
+│                                                                      │
+│   ✅ Valid signature    → Proceed to MARS                            │
+│   ❌ Invalid signature  → Reject (never reaches runtime)             │
+│   ❌ Bad format         → Reject (malformed data blocked)            │
+└──────────────────────────────────────┬───────────────────────────────┘
+                                       │
+                                       ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                       ✅ TRUSTED ZONE                                │
+│              MARS execution + TAR persistence                        │
+│                                                                      │
+│   • Deterministic state transitions                                  │
+│   • Crash-safe writes                                                │
+│   • Recoverable on restart                                           │
+└──────────────────────────────────────────────────────────────────────┘
+</pre>
+        </div>
+        
+        <h2>Component Responsibilities</h2>
+        
+        <div class="card-grid">
+            <div class="card" style="border-top: 3px solid #3b82f6;">
+                <div class="card-icon">🌐</div>
+                <div class="card-title">POPEYE — Network Layer</div>
+                <div class="card-description">
+                    <strong>Does:</strong> Peer discovery, gossip propagation, message routing, duplicate suppression<br><br>
+                    <strong>Does NOT:</strong> Mutate state, validate economics, finalize blocks
+                </div>
+            </div>
+            
+            <div class="card" style="border-top: 3px solid #f59e0b;">
+                <div class="card-icon">🔐</div>
+                <div class="card-title">TEV — Crypto Gate</div>
+                <div class="card-description">
+                    <strong>Does:</strong> Ed25519 verification, format enforcement, replay protection<br><br>
+                    <strong>Does NOT:</strong> Store state, touch network, persist data
+                </div>
+            </div>
+            
+            <div class="card" style="border-top: 3px solid #10b981;">
+                <div class="card-icon">🧠</div>
+                <div class="card-title">MARS — Runtime</div>
+                <div class="card-description">
+                    <strong>Does:</strong> State transitions, block production, transaction validation<br><br>
+                    <strong>Does NOT:</strong> Network IO, disk IO, RPC handling
+                </div>
+            </div>
+            
+            <div class="card" style="border-top: 3px solid #ef4444;">
+                <div class="card-icon">💾</div>
+                <div class="card-title">TAR — Storage</div>
+                <div class="card-description">
+                    <strong>Does:</strong> Block storage, state snapshots, crash recovery<br><br>
+                    <strong>Does NOT:</strong> Validate data, execute logic, communicate over network
+                </div>
+            </div>
+        </div>
+        
+        <h2>Design Properties</h2>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Implementation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>🔒 Determinism</strong></td>
+                        <td>Same inputs → same outputs, always</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🧩 Separation</strong></td>
+                        <td>Each crate has exactly one responsibility</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🛡️ Fault Isolation</strong></td>
+                        <td>Failures are contained to one layer</td>
+                    </tr>
+                    <tr>
+                        <td><strong>💾 Recoverability</strong></td>
+                        <td>TAR provides crash-safe persistence</td>
+                    </tr>
+                    <tr>
+                        <td><strong>📊 Observability</strong></td>
+                        <td>Clear boundaries for logging and metrics</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🔌 Extensibility</strong></td>
+                        <td>Consensus layer plugs in cleanly</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <h2>Transaction Lifecycle</h2>
+        
+        <div class="diagram-box">
+<pre>
+1. User submits transaction
+        ↓
+2. POPEYE receives from peer network
+        ↓
+3. TEV verifies signature + format
+        ↓
+   ┌────┴────┐
+   │ Valid?  │
+   └────┬────┘
+        │
+   YES ─┼─ NO → Reject (never reaches MARS)
+        ↓
+4. MARS validates transaction rules
+        ↓
+   ┌────┴────┐
+   │ Valid?  │
+   └────┬────┘
+        │
+   YES ─┼─ NO → Reject (rules violation)
+        ↓
+5. TAR persists to mempool
+        ↓
+6. MARS includes in next block
+        ↓
+7. TAR persists block + state
+        ↓
+8. POPEYE broadcasts to peers
+</pre>
+        </div>
+        
+        <h2>Disk Layout</h2>
+        
+        <div class="diagram-box">
+<pre>
+data/
+├── blocks/
+│   ├── 000000.block      # Genesis block
+│   ├── 000001.block      # Block at height 1
+│   └── ...
+├── state/
+│   ├── latest.state      # Current state snapshot
+│   └── snapshot_000100.state  # Periodic checkpoints
+└── meta/
+    └── chain.meta        # Chain metadata
+</pre>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <p>© 2026 Unykorn Team • <a href="https://github.com/unykornai/Popeye-Tars-Mars-Tev">GitHub</a> • MIT License</p>
+    </footer>
+</body>
+</html>
