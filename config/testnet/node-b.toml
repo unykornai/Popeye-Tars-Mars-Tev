@@ -1,0 +1,21 @@
+[node]
+data_dir = "C:\\Users\\Kevan\\popeye,mars,tar,tev\\scripts\\..\\data\\testnet\\node-b"
+log_level = "debug"
+
+[network]
+listen_port = 30301
+max_peers = 50
+enable_discovery = true
+bootstrap_peers = ["/ip4/127.0.0.1/tcp/30300"]
+
+[runtime]
+chain_id = "unykorn-testnet-aurora"
+producer_enabled = true
+producer_key = "89e61266d713210df985797305d2187313271701980860579216124574945780"
+
+[consensus]
+propose_timeout = 3000
+prevote_timeout = 2000
+commit_timeout = 2000
+timeout_delta = 500
+max_rounds = 10
